@@ -36,15 +36,17 @@ public class NoteContainerFragment extends AbstractContainerFragment {
 
     private static final String KEY_NOTEBOOK = "KEY_NOTEBOOK";
     private static final String KEY_LINKED_NOTEBOOK = "KEY_LINKED_NOTEBOOK";
+    private static final String KEY_RECEIVED_STRING = "KEY_RECEIVED_STRING";
 
     public static NoteContainerFragment create() {
-        return create(null, null);
+        return create(null, null, null);
     }
 
-    public static NoteContainerFragment create(@Nullable Notebook notebook, @Nullable LinkedNotebook linkedNotebook) {
+    public static NoteContainerFragment create(@Nullable Notebook notebook, @Nullable LinkedNotebook linkedNotebook, @Nullable String mReceivedString) {
         Bundle args = new Bundle();
         args.putSerializable(KEY_NOTEBOOK, notebook);
         args.putSerializable(KEY_LINKED_NOTEBOOK, linkedNotebook);
+        args.putSerializable(KEY_RECEIVED_STRING, mReceivedString);
 
         NoteContainerFragment fragment = new NoteContainerFragment();
         fragment.setArguments(args);
@@ -53,6 +55,7 @@ public class NoteContainerFragment extends AbstractContainerFragment {
 
     private Notebook mNotebook;
     private LinkedNotebook mLinkedNotebook;
+    private String mReceivedString;
 
     private String mQuery;
 
@@ -63,6 +66,7 @@ public class NoteContainerFragment extends AbstractContainerFragment {
 
         mNotebook = (Notebook) getArguments().getSerializable(KEY_NOTEBOOK);
         mLinkedNotebook = (LinkedNotebook) getArguments().getSerializable(KEY_LINKED_NOTEBOOK);
+        mReceivedString = (String) getArguments().getSerializable(KEY_RECEIVED_STRING);
     }
 
     @Override
@@ -123,7 +127,7 @@ public class NoteContainerFragment extends AbstractContainerFragment {
                     .commit();
         } else {
             getChildFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, NoteListFragment.create(noteRefList))
+                    .replace(R.id.fragment_container, NoteListFragment.create(noteRefList, mReceivedString))
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .commit();
         }

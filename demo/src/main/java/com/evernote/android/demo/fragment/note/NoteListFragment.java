@@ -24,6 +24,7 @@ import com.evernote.android.demo.task.BaseTask;
 import com.evernote.android.demo.task.DeleteNoteTask;
 import com.evernote.android.demo.task.GetNoteContentTask;
 import com.evernote.android.demo.task.GetNoteHtmlTask;
+import com.evernote.android.demo.task.UpdateNoteTask;
 import com.evernote.android.demo.util.ParcelableUtil;
 import com.evernote.android.demo.util.ViewUtil;
 import com.evernote.android.intent.EvernoteIntent;
@@ -43,10 +44,13 @@ import java.util.List;
 public class NoteListFragment extends Fragment {
 
     private static final String KEY_NOTE_LIST = "KEY_NOTE_LIST";
+    private static final String KEY_RECEIVED_STRING = "KEY_RECEIVED_STRING";
 
-    public static NoteListFragment create(List<NoteRef> noteRefList) {
+
+    public static NoteListFragment create(List<NoteRef> noteRefList, String mReceivedString) {
         Bundle args = new Bundle();
         ParcelableUtil.putParcelableList(args, noteRefList, KEY_NOTE_LIST);
+        args.putSerializable(KEY_RECEIVED_STRING, mReceivedString);
 
         NoteListFragment fragment = new NoteListFragment();
         fragment.setArguments(args);
@@ -54,6 +58,7 @@ public class NoteListFragment extends Fragment {
     }
 
     private List<NoteRef> mNoteRefList;
+    private String mReceivedString;
 
     private AbsListView mListView;
     private MyAdapter mAdapter;
@@ -63,6 +68,7 @@ public class NoteListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mNoteRefList = getArguments().getParcelableArrayList(KEY_NOTE_LIST);
+        mReceivedString = (String) getArguments().getSerializable(KEY_RECEIVED_STRING);
     }
 
     @Nullable
@@ -74,7 +80,8 @@ public class NoteListFragment extends Fragment {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                new GetNoteHtmlTask(mNoteRefList.get(position)).start(NoteListFragment.this, "html");
+
+                new UpdateNoteTask(mNoteRefList.get(position), mReceivedString).start(NoteListFragment.this, "updated");
             }
         });
 
@@ -138,7 +145,7 @@ public class NoteListFragment extends Fragment {
                 return true;
 
             case 2:
-                new GetNoteContentTask(noteRef).start(this, "content");
+                new GetNoteHtmlTask(noteRef).start(this, "html");
                 return true;
 
             case 3:
@@ -150,6 +157,7 @@ public class NoteListFragment extends Fragment {
         }
     }
 
+
     @TaskResult
     public void onNoteShared(String url) {
         if (!TextUtils.isEmpty(url)) {
@@ -158,6 +166,7 @@ public class NoteListFragment extends Fragment {
             ViewUtil.showSnackbar(mListView, "URL is null");
         }
     }
+
 
     @TaskResult
     public void onNoteDeleted(DeleteNoteTask.Result result) {
@@ -169,9 +178,10 @@ public class NoteListFragment extends Fragment {
     }
 
     @TaskResult(id = "content")
-    public void onGetNoteContent(Note note) {
+    public void onGetNoteContent(Note note, GetNoteContentTask task) {
         if (note != null) {
-            NoteContentDialogFragment.create(note).show(getChildFragmentManager(), NoteContentDialogFragment.TAG);
+
+
         } else {
             ViewUtil.showSnackbar(mListView, "Get content failed");
         }
@@ -180,6 +190,11 @@ public class NoteListFragment extends Fragment {
     @TaskResult(id = "html")
     public void onGetNoteContentHtml(String html, GetNoteHtmlTask task) {
         startActivity(ViewHtmlActivity.createIntent(getActivity(), task.getNoteRef(), html));
+    }
+
+    @TaskResult(id = "update")
+    public void onNoteUpdated(String result, UpdateNoteTask task) {
+        startActivity(ViewHtmlActivity.createIntent(getActivity(), task.getNoteRef(), result));
     }
 
     private class MyAdapter extends BaseAdapter {

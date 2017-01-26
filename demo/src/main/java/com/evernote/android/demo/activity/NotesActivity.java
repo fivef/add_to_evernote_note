@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.evernote.android.demo.R;
@@ -25,6 +26,8 @@ public class NotesActivity extends AppCompatActivity {
     private static final String KEY_NOTEBOOK = "KEY_NOTEBOOK";
     private static final String KEY_LINKED_NOTEBOOK = "KEY_LINKED_NOTEBOOK";
 
+
+
     public static Intent createIntent(Context context, Notebook notebook) {
         Intent intent = new Intent(context, NotesActivity.class);
         intent.putExtra(KEY_NOTEBOOK, notebook);
@@ -39,6 +42,7 @@ public class NotesActivity extends AppCompatActivity {
 
     private Notebook mNotebook;
     private LinkedNotebook mLinkedNotebook;
+    public String mReceivedString;
 
     @SuppressWarnings("ConstantConditions")
     @Override
@@ -64,15 +68,53 @@ public class NotesActivity extends AppCompatActivity {
         if (mNotebook != null) {
             getSupportActionBar().setTitle(mNotebook.getName());
         } else {
-            getSupportActionBar().setTitle(mLinkedNotebook.getShareName());
-            new LoadNotebookNameTask(mLinkedNotebook).start(this, "notebookName");
+            if (mLinkedNotebook != null) {
+                getSupportActionBar().setTitle(mLinkedNotebook.getShareName());
+                new LoadNotebookNameTask(mLinkedNotebook).start(this, "notebookName");
+            }
         }
+
+
+        // Get intent, action and MIME type
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+
+        mReceivedString = null;
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type)) {
+
+                String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+                if (sharedText != null) {
+                    Log.w("evernote_demo", "Received intent with content " + sharedText);
+                    mReceivedString = sharedText;
+                }
+
+
+            } else if (type.startsWith("image/")) {
+                Log.w("evernote_demo", "Receiving images currently not supported");
+                //handleSendImage(intent); // Handle single image being sent
+            }
+        } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
+            if (type.startsWith("image/")) {
+                //handleSendMultipleImages(intent); // Handle multiple images being sent
+                Log.w("evernote_demo", "Receiving multiple images currently not supported");
+            }
+        } else {
+            // Handle other intents, such as being started from the home screen
+        }
+
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, NoteContainerFragment.create(mNotebook, mLinkedNotebook))
+                    .replace(R.id.fragment_container, NoteContainerFragment.create(mNotebook, mLinkedNotebook, mReceivedString))
                     .commit();
         }
+
+
+
+
     }
 
     @Override

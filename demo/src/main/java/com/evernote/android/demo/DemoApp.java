@@ -1,6 +1,7 @@
 package com.evernote.android.demo;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.evernote.client.android.EvernoteSession;
 
@@ -50,6 +51,9 @@ public class DemoApp extends Application {
             consumerKey = CONSUMER_KEY;
         }
 
+        Log.w("myApp", "consumer key " + consumerKey);
+
+
         String consumerSecret;
         if ("Your consumer secret".equals(CONSUMER_SECRET)) {
             consumerSecret = BuildConfig.EVERNOTE_CONSUMER_SECRET;
@@ -57,6 +61,8 @@ public class DemoApp extends Application {
             // isn't the default value anymore
             consumerSecret = CONSUMER_SECRET;
         }
+
+        Log.w("myApp", "consumer secret " + consumerSecret);
 
         //Set up the Evernote singleton session, use EvernoteSession.getInstance() later
         new EvernoteSession.Builder(this)

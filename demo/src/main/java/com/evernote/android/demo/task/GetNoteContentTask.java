@@ -19,4 +19,8 @@ public class GetNoteContentTask extends BaseTask<Note> {
     protected Note checkedExecute() throws Exception {
         return mNoteRef.loadNote(true, false, false, false);
     }
+
+    public NoteRef getNoteRef() {
+        return mNoteRef;
+    }
 }
