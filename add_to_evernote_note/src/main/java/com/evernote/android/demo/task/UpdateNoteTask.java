@@ -57,17 +57,6 @@ public class UpdateNoteTask extends BaseTask<String> {
 
     @Override
     protected String checkedExecute() throws Exception {
-        EvernoteClientFactory clientFactory = EvernoteSession.getInstance().getEvernoteClientFactory();
-
-        EvernoteHtmlHelper htmlHelper;
-        if (mNoteRef.isLinked()) {
-            htmlHelper = clientFactory.getLinkedHtmlHelper(mNoteRef.loadLinkedNotebook());
-        } else {
-            htmlHelper = clientFactory.getHtmlHelperDefault();
-        }
-
-        Response response = htmlHelper.downloadNote(mNoteRef.getGuid());
-        //String content = htmlHelper.parseBody(response);
 
         Note note = mNoteRef.loadNote(true, false, false, false);
 
@@ -173,7 +162,20 @@ public class UpdateNoteTask extends BaseTask<String> {
 
         Log.w("evernote_demo", "updated!!! with " + m_string_to_append);
 
+
+        EvernoteClientFactory clientFactory = EvernoteSession.getInstance().getEvernoteClientFactory();
+
+        EvernoteHtmlHelper htmlHelper;
+        if (mNoteRef.isLinked()) {
+            htmlHelper = clientFactory.getLinkedHtmlHelper(mNoteRef.loadLinkedNotebook());
+        } else {
+            htmlHelper = clientFactory.getHtmlHelperDefault();
+        }
+
+        Response response = htmlHelper.downloadNote(mNoteRef.getGuid());
+        //return htmlHelper.parseBody(response);
         return note.getContent();
+
     }
 
     protected Note updateNote(Note note) throws EDAMUserException, EDAMSystemException, TException, EDAMNotFoundException

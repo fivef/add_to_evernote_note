@@ -180,8 +180,7 @@ public class NoteListFragment extends Fragment {
     @TaskResult(id = "content")
     public void onGetNoteContent(Note note, GetNoteContentTask task) {
         if (note != null) {
-
-
+            NoteContentDialogFragment.create(note).show(getChildFragmentManager(), NoteContentDialogFragment.TAG);
         } else {
             ViewUtil.showSnackbar(mListView, "Get content failed");
         }
@@ -192,7 +191,7 @@ public class NoteListFragment extends Fragment {
         startActivity(ViewHtmlActivity.createIntent(getActivity(), task.getNoteRef(), html));
     }
 
-    @TaskResult(id = "update")
+    @TaskResult(id = "updated")
     public void onNoteUpdated(String result, UpdateNoteTask task) {
         startActivity(ViewHtmlActivity.createIntent(getActivity(), task.getNoteRef(), result));
     }
