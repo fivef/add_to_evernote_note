@@ -79,34 +79,40 @@ public class UpdateNoteTask extends BaseTask<String> {
             empty_line = "<div><br /></div>";
         }
 
-        String html_string_to_append = stringToHTML(m_string_to_append);
+        if(m_string_to_append != null && m_string_to_append != "") {
 
-        String resulting_content = first_part + empty_line + html_string_to_append + second_part;
+            String html_string_to_append = stringToHTML(m_string_to_append);
 
-        Log.w("evernote_demo", "resulting_content= " + resulting_content);
+            String resulting_content = first_part + empty_line + html_string_to_append + second_part;
 
-        //TODO: somehow the resulting_content should be checked for enml confirmity (see bottom of https://dev.evernote.com/doc/articles/enml.php)
+            Log.w("evernote_demo", "resulting_content= " + resulting_content);
 
-        note.setContent(resulting_content);
+            //TODO: somehow the resulting_content should be checked for enml confirmity (see bottom of https://dev.evernote.com/doc/articles/enml.php)
+
+            note.setContent(resulting_content);
 
 
-        try {
-            Note updated_note = updateNote(note);
-        } catch (EDAMUserException e) {
-            e.printStackTrace();
-            return null;
-        } catch (EDAMSystemException e) {
-            e.printStackTrace();
-            return null;
-        } catch (TException e) {
-            e.printStackTrace();
-            return null;
-        } catch (EDAMNotFoundException e) {
-            e.printStackTrace();
-            return null;
+            try {
+                Note updated_note = updateNote(note);
+            } catch (EDAMUserException e) {
+                e.printStackTrace();
+                return null;
+            } catch (EDAMSystemException e) {
+                e.printStackTrace();
+                return null;
+            } catch (TException e) {
+                e.printStackTrace();
+                return null;
+            } catch (EDAMNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            Log.w("evernote_demo", "appended to note: " + m_string_to_append);
+
+        }else{
+            Log.w("evernote_demo", "No Data received, note was not updated!");
         }
-
-        Log.w("evernote_demo", "updated!!! with " + m_string_to_append);
 
 
         EvernoteClientFactory clientFactory = EvernoteSession.getInstance().getEvernoteClientFactory();
