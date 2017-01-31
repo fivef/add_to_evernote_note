@@ -35,17 +35,16 @@ public class FindNotesTask extends BaseTask<List<NoteRef>> {
 
         if (!TextUtils.isEmpty(query)) {
             noteFilter.setWords(query);
+        }else{
+            //TODO: let the user choose a tag he wants here we just use favorit as tag to filter by
+            List<String> list = new ArrayList();
+            list.add("03750a45-c107-4e8b-afbf-29fa22777244");
+            noteFilter.setTagGuids(list);
         }
 
         if (notebook != null) {
             noteFilter.setNotebookGuid(notebook.getGuid());
         }
-
-        //TODO: let the user choose a tag he wants here we just use favorit as tag to filter by
-        List<String> list = new ArrayList();
-        list.add("03750a45-c107-4e8b-afbf-29fa22777244");
-        noteFilter.setTagGuids(list);
-        //noteFilter.setTagGuids();
 
         mSearch = new EvernoteSearchHelper.Search()
                 .setOffset(offset)
